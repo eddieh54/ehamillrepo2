@@ -5,7 +5,8 @@ import re
 newran = ''
 word = ''
 new = ''
-
+# PROBLEM == NOT GIVING TIME FOR GUESS() EX SELECTION STAYS OPEN UNTIL COMMAND, WITH GUESS IF NO COMMAND PYGAME CRASHES
+# figure out how to assing an if to a function call
 pygame.init()
 #screen dimensions
 screen = pygame.display.set_mode((800, 600))
@@ -22,10 +23,7 @@ red = (255, 0, 0)
 hangbase = pygame.image.load('download.v3.png')
 hangbaseX = 217
 hangbaseY = 60
-#hangman head
-manhead = pygame.image.load('2download.png')
-manheadX = 270.5
-manheadY = 163
+
 #text
 font = pygame.font.Font(None, 50)
 texttop = font.render('select a difficulty', True, black)
@@ -33,7 +31,7 @@ textleft = font.render('easy', True, black)
 textmid = font.render('medium', True, black)
 textright = font.render('hard', True, black)
 
-textA = font.render('a', True, black)
+textA = font.render(' a ', True, black)
 textB = font.render('b', True, black)
 textC = font.render('c', True, black)
 textD = font.render('d', True, black)
@@ -157,9 +155,17 @@ recZ.center = (490,555)
 
 
 #hangman base function
+
 def base():
     screen.blit(hangbase, (hangbaseX, hangbaseY))
-#functions for easy, medium, difficult click
+
+def manhd():
+    pygame.draw.circle(screen, black, (455, 230), 25, 5)
+
+def manbody():
+    pygame.draw.line(screen, black, (455, 255), (455, 310), 5)
+    
+#functions for easy, medium, difficult, and letters click detection
 def difclicke():
     if pygame.mouse.get_pressed()[0] and pygame.Rect(textRecleft).collidepoint(pos):
         return True
@@ -174,6 +180,7 @@ def difclickh():
     if pygame.mouse.get_pressed()[0] and pygame.Rect(textRecright).collidepoint(pos):
         return True
     return False
+
 #funciton for reseting screen
 def letters():
     screen.blit(textA, recA)
@@ -202,23 +209,9 @@ def letters():
     screen.blit(textX, recX)
     screen.blit(textY, recY)
     screen.blit(textZ, recZ)
-
-def blanksc():
-    global newran
-    while running:
-        screen.fill(white)
-        base()
-        font = pygame.font.Font(None, 90)
-        newtxt = font.render(str(newran), True, black)
-        textRecran = newtxt.get_rect()
-        textRecran.center = (800//2, 100)
-        screen.blit(newtxt, textRecran)
-        letters()
-        pygame.display.update()
- 
 #function for selecting difficulty
+#picks a random word and displays it as dashes
 def selection():
-    #write for loop, for len(rword), screen.blit x amount of _'s
     global newran
     global word
     screen.blit(texttop, textRectop)
@@ -238,7 +231,7 @@ def selection():
             rword = word
             new = list(rword)
             newran = ('_ ' * len(new))
-            return (word, blanksc())
+            return (word, guess())
 
         elif difclickm() == True:
             strl = ''
@@ -247,7 +240,7 @@ def selection():
             rword = word
             new = list(rword)
             newran = ('_ ' * len(new))
-            return (word, blanksc())
+            return (word, guess())
 
         elif difclickh() == True:
             wordlist = re.findall(r'\b[a-zA-Z]{7}\b',data) 
@@ -255,24 +248,428 @@ def selection():
             rword = word
             new = list(rword)
             newran = ('_ ' * len(new))
-            return (word, new, blanksc())
-
+            return (word, guess())
+#guess function if letter is in the ran word it turns green and shows in the word, if its not it turns red and draws a part of the man
 def guess():
-    if pygame.mouse.get_pressed()[0] and pygame.Rect(recA).collidepoint(pos):
-        if 'a' in word:
-            textA = font.render('a', True, green)
-        elif 'a' not in word:
-            textA = font.render('a', True, red)
+
+    global word
+    global newran
+    global running
+    global pos
+
+    guessct = 0
+
+    while running:
+        for event in pygame.event.get():
+            pos = pygame.mouse.get_pos()
+            if event.type == pygame.QUIT:
+                running = False
+
+        print(word)
+        screen.fill(white)
+        font2 = pygame.font.Font(None, 90)
+        newtxt = font2.render(str(newran), True, black)
+        textRecran = newtxt.get_rect()
+        textRecran.center = (800//2, 100)
+        screen.blit(newtxt, textRecran)
+        letters()
+        base()
+
+        if pygame.mouse.get_pressed()[0] and pygame.Rect(recA).collidepoint(pos):
                 
-        elif pygame.mouse.get_pressed()[0] and pygame.Rect(recB).collidepoint(pos):
+            if 'a' in word:
+                while running:
+                    for event in pygame.event.get():
+                        pos = pygame.mouse.get_pos()
+                        if event.type == pygame.QUIT:
+                            running = False
+                    textA = font.render('a', True, green)
+                    recA.center = (260,405)
+                    screen.blit(textA, recA)
+                    pygame.display.update()
+                        
+
+            elif 'a' not in word:
+                guessct += 1
+                while running:
+                    for event in pygame.event.get():
+                        pos = pygame.mouse.get_pos()
+                        if event.type == pygame.QUIT:
+                            running = False
+                    textA = font.render('a', True, red)
+                    recA.center = (260,405)
+                    screen.blit(textA, recA)
+                    if guessct == 1:
+                        manhd()
+                    elif guessct == 2:
+                        manbody()
+                    elif guessct == 3:
+                        manarm1()
+                    elif guessct == 4:
+                        manarm2()
+                    elif guessct == 5:
+                        manleg1()
+                    elif guessct == 6:
+                        manleg2()
+                    pygame.display.update()
+
+                                            
+        if pygame.mouse.get_pressed()[0] and pygame.Rect(recB).collidepoint(pos):
+
             if 'b' in word:
-                textB = font.render('b', True, green)
+                while running:
+                    textB = font.render('b', True, green)
+                    screen.blit(textB, recB)
+                    pygame.display.update()
+
             elif 'b' not in word:
-                textB = font.render('b', True, red)
+                while running:
+                    textB = font.render('b', True, red)
+                    screen.blit(textB, recB)
+                    pygame.display.update()
+
+        if pygame.mouse.get_pressed()[0] and pygame.Rect(recC).collidepoint(pos):
+
+            if 'c' in word:
+                while running:
+                    textC = font.render('c', True, green)
+                    screen.blit(textC, recC)
+                    pygame.display.update()
+
+            elif 'c' not in word:
+                while running:
+                    textC = font.render('c', True, red)
+                    screen.blit(textC, recC)
+                    pygame.display.update()
+
+        if pygame.mouse.get_pressed()[0] and pygame.Rect(recD).collidepoint(pos):
+
+            if 'd' in word:
+                while running:
+                    textD = font.render('d', True, green)
+                    screen.blit(textD, recD)
+                    pygame.display.update()
+
+            elif 'd' not in word:
+                while running:
+                    textD = font.render('d', True, red)
+                    screen.blit(textD, recD)
+                    pygame.display.update()
+
+        if pygame.mouse.get_pressed()[0] and pygame.Rect(recE).collidepoint(pos):
+
+            if 'e' in word:
+                while running:
+                    textE = font.render('e', True, green)
+                    screen.blit(textE, recE)
+                    pygame.display.update()
+
+            elif 'e' not in word:
+                while running:
+                    textE = font.render('e', True, red)
+                    screen.blit(textE, recE)
+                    pygame.display.update()
+
+        if pygame.mouse.get_pressed()[0] and pygame.Rect(recF).collidepoint(pos):
+
+            if 'f' in word:
+                while running:
+                    textF = font.render('f', True, green)
+                    screen.blit(textF, recF)
+                    pygame.display.update()
+
+            elif 'f' not in word:
+                while running:
+                    textF = font.render('f', True, red)
+                    screen.blit(textF, recF)
+                    pygame.display.update()
+
+        if pygame.mouse.get_pressed()[0] and pygame.Rect(recG).collidepoint(pos):
+
+            if 'g' in word:
+                while running:
+                    textG = font.render('g', True, green)
+                    screen.blit(textG, recG)
+                    pygame.display.update()
+
+            elif 'g' not in word:
+                while running:
+                    textG = font.render('g', True, red)
+                    screen.blit(textG, recG)
+                    pygame.display.update()
+
+        if pygame.mouse.get_pressed()[0] and pygame.Rect(recH).collidepoint(pos):
+
+            if 'h' in word:
+                while running:
+                    textH = font.render('h', True, green)
+                    screen.blit(textH, recH)
+                    pygame.display.update()
+
+            elif 'h' not in word:
+                while running:
+                    textH = font.render('h', True, red)
+                    screen.blit(textH, recH)
+                    pygame.display.update()
+
+        if pygame.mouse.get_pressed()[0] and pygame.Rect(recI).collidepoint(pos):
+
+            if 'i' in word:
+                while running:
+                    textI = font.render('i', True, green)
+                    screen.blit(textI, recI)
+                    pygame.display.update()
+
+            elif 'i' not in word:
+                while running:
+                    textI = font.render('i', True, red)
+                    screen.blit(textI, recI)
+                    pygame.display.update()
+
+        if pygame.mouse.get_pressed()[0] and pygame.Rect(recJ).collidepoint(pos):
+
+            if 'j' in word:
+                while running:
+                    textJ = font.render('j', True, green)
+                    screen.blit(textJ, recJ)
+                    pygame.display.update()
+
+            elif 'j' not in word:
+                while running:
+                    textJ = font.render('j', True, red)
+                    screen.blit(textJ, recJ)
+                    pygame.display.update()
+
+        if pygame.mouse.get_pressed()[0] and pygame.Rect(recK).collidepoint(pos):
+
+            if 'k' in word:
+                while running:
+                    textK = font.render('k', True, green)
+                    screen.blit(textK, recK)
+                    pygame.display.update()
+
+            elif 'k' not in word:
+                while running:
+                    textK = font.render('k', True, red)
+                    screen.blit(textK, recK)
+                    pygame.display.update()
+
+        if pygame.mouse.get_pressed()[0] and pygame.Rect(recL).collidepoint(pos):
+
+            if 'l' in word:
+                while running:
+                    textL = font.render('l', True, green)
+                    screen.blit(textL, recL)
+                    pygame.display.update()
+
+            elif 'l' not in word:
+                while running:
+                    textL = font.render('l', True, red)
+                    screen.blit(textL, recL)
+                    pygame.display.update()
+
+        if pygame.mouse.get_pressed()[0] and pygame.Rect(recM).collidepoint(pos):
+
+            if 'm' in word:
+                while running:
+                    textM = font.render('m', True, green)
+                    screen.blit(textM, recM)
+                    pygame.display.update()
+
+            elif 'm' not in word:
+                while running:
+                    textM = font.render('m', True, red)
+                    screen.blit(textM, recM)
+                    pygame.display.update()
+
+        if pygame.mouse.get_pressed()[0] and pygame.Rect(recN).collidepoint(pos):
+
+            if 'n' in word:
+                while running:
+                    textN = font.render('n', True, green)
+                    screen.blit(textN, recN)
+                    pygame.display.update()
+
+            elif 'n' not in word:
+                while running:
+                    textN = font.render('n', True, red)
+                    screen.blit(textN, recN)
+                    pygame.display.update()
+
+        if pygame.mouse.get_pressed()[0] and pygame.Rect(recO).collidepoint(pos):
+
+            if 'o' in word:
+                while running:
+                    textO = font.render('o', True, green)
+                    screen.blit(textO, recO)
+                    pygame.display.update()
+
+            elif 'o' not in word:
+                while running:
+                    textO = font.render('o', True, red)
+                    screen.blit(textO, recO)
+                    pygame.display.update()
+
+        if pygame.mouse.get_pressed()[0] and pygame.Rect(recP).collidepoint(pos):
+
+            if 'p' in word:
+                while running:
+                    textP = font.render('p', True, green)
+                    screen.blit(textP, recP)
+                    pygame.display.update()
+
+            elif 'p' not in word:
+                while running:
+                    textP = font.render('p', True, red)
+                    screen.blit(textP, recP)
+                    pygame.display.update()
+
+        if pygame.mouse.get_pressed()[0] and pygame.Rect(recQ).collidepoint(pos):
+
+            if 'q' in word:
+                while running:
+                    textQ = font.render('q', True, green)
+                    screen.blit(textQ, recQ)
+                    pygame.display.update()
+
+            elif 'q' not in word:
+                while running:
+                    textQ = font.render('q', True, red)
+                    screen.blit(textQ, recQ)
+                    pygame.display.update()
+
+        if pygame.mouse.get_pressed()[0] and pygame.Rect(recR).collidepoint(pos):
+
+            if 'r' in word:
+                while running:
+                    textR = font.render('r', True, green)
+                    screen.blit(textR, recR)
+                    pygame.display.update()
+
+            elif 'r' not in word:
+                while running:
+                    textR = font.render('r', True, red)
+                    screen.blit(textR, recR)
+                    pygame.display.update()
+
+        if pygame.mouse.get_pressed()[0] and pygame.Rect(recS).collidepoint(pos):
+
+            if 's' in word:
+                while running:
+                    textS = font.render('s', True, green)
+                    screen.blit(textS, recS)
+                    pygame.display.update()
+
+            elif 's' not in word:
+                while running:
+                    textS = font.render('s', True, red)
+                    screen.blit(textS, recS)
+                    pygame.display.update()
+
+        if pygame.mouse.get_pressed()[0] and pygame.Rect(recT).collidepoint(pos):
+
+            if 't' in word:
+                while running:
+                    textT = font.render('t', True, green)
+                    screen.blit(textT, recT)
+                    pygame.display.update()
+
+            elif 't' not in word:
+                while running:
+                    textT = font.render('t', True, red)
+                    screen.blit(textT, recT)
+                    pygame.display.update()
+
+        if pygame.mouse.get_pressed()[0] and pygame.Rect(recU).collidepoint(pos):
+
+            if 'u' in word:
+                while running:
+                    textU = font.render('u', True, green)
+                    screen.blit(textU, recU)
+                    pygame.display.update()
+
+            elif 'u' not in word:
+                while running:
+                    textU = font.render('u', True, red)
+                    screen.blit(textU, recU)
+                    pygame.display.update()
+
+        if pygame.mouse.get_pressed()[0] and pygame.Rect(recV).collidepoint(pos):
+
+            if 'v' in word:
+                while running:
+                    textV = font.render('v', True, green)
+                    screen.blit(textV, recV)
+                    pygame.display.update()
+
+            elif 'v' not in word:
+                while running:
+                    textV = font.render('v', True, red)
+                    screen.blit(textV, recV)
+                    pygame.display.update()
+
+        if pygame.mouse.get_pressed()[0] and pygame.Rect(recW).collidepoint(pos):
+
+            if 'w' in word:
+                while running:
+                    textW = font.render('w', True, green)
+                    screen.blit(textW, recW)
+                    pygame.display.update()
+
+            elif 'w' not in word:
+                while running:
+                    textW = font.render('w', True, red)
+                    screen.blit(textW, recW)
+                    pygame.display.update()
+
+        if pygame.mouse.get_pressed()[0] and pygame.Rect(recX).collidepoint(pos):
+
+            if 'x' in word:
+                while running:
+                    textX = font.render('x', True, green)
+                    screen.blit(textX, recX)
+                    pygame.display.update()
+
+            elif 'x' not in word:
+                while running:
+                    textX = font.render('x', True, red)
+                    screen.blit(textX, recX)
+                    pygame.display.update()
+
+        if pygame.mouse.get_pressed()[0] and pygame.Rect(recY).collidepoint(pos):
+
+            if 'y' in word:
+                while running:
+                    textY = font.render('y', True, green)
+                    screen.blit(textY, recY)
+                    pygame.display.update()
+
+            elif 'y' not in word:
+                while running:
+                    textY = font.render('y', True, red)
+                    screen.blit(textY, recY)
+                    pygame.display.update()
+
+        if pygame.mouse.get_pressed()[0] and pygame.Rect(recZ).collidepoint(pos):
+
+            if 'z' in word:
+                while running:
+                    textZ = font.render('z', True, green)
+                    screen.blit(textZ, recZ)
+                    pygame.display.update()
+
+            elif 'z' not in word:
+                while running:
+                    textZ = font.render('z', True, red)
+                    screen.blit(textZ, recZ)
+                    pygame.display.update()
+
+
+
+        pygame.display.update()
         
 def game():
     selection()
-    
 
 #main line    
 running = True
@@ -283,5 +680,5 @@ while running:
         if event.type == pygame.QUIT:
             running = False
     game()
-
     pygame.display.update()
+
