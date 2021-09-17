@@ -103,13 +103,12 @@ public class MyClass {
         139027,
         108208};
         int sum = 0;
-        int [] div = {}
+     
 
         for (int i : mass) {
             sum = (i/3)-2;
-            div.add(i)
             System.out.println(sum);
-            System.out.println(div)
+       
 
         //for (int i : mass) {}
 
