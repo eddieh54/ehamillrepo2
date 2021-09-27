@@ -1,0 +1,19 @@
+public class MyClass {
+    public static void main(String args[]) {
+        int num = 0;
+        int x = 130254;
+        while (x >= 130254 && x <= 678275){
+            String str = String.valueOf(x); 
+            char[] d = str.toCharArray();
+            if (d[0] <= d[1] && d[1] <= d[2] && d[2] <= d[3] && d[3] <= d[4] && d[4] <= d[5]){
+                if (d[0] == d[1] || d[1] == d[2] || d[2] == d[3] || d[3] == d[4] || d[4] == d[5]){
+                    num += 1; 
+                }
+                
+            }
+            x++; 
+        } 
+        
+        System.out.println(num); 
+    } 
+}
